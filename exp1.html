@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <h1> Expense </h1>
+        <form onsubmit="saveTolocalStorage(event)">
+            <div class="form-group">
+                <label>Expense Amount:</label>
+                <input type="text" name="ExpenseAmount" id="ExpenseAmount" class="form-control" value="" required="">
+            </div>
+            <div class="form-group">
+                <label>Expense Description:</label>
+                <input type="text" name="Description" id="Description" class="form-control" value="" required="">
+            
+            <div class="form-group">
+                <label>ExpenseCategory:</label>
+                <select class="form-control" name="ExpenseCategory" id="ExpenseCategory" value="" required="" >
+                    <option>food</option>
+                    <option>movies</option>
+                    <option>fuel</option>
+                    </select>
+            </div>
+            <button type="submit" id="btnaddExpense" class="btn btn-primary save-btn">add Expense</button>
+
+             </form>
+        <ul id="addcustomerform"></ul>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.3/axios.min.js"</script></script>
+        <script>
+          
+          function saveTolocalStorage(event){
+            event.preventDefault();
+            const ExpenseAmount = event.target.ExpenseAmount.value;
+            const Description = event.target.Description.value;
+            const ExpenseCategory = event.target.ExpenseCategory.value;
+            
+            const obj = {
+              ExpenseAmount,
+              Description,
+              ExpenseCategory
+              }
+
+              axios.post("https://crudcrud.com/api/2a733488d8e34d288c3a851ed99426f9/Details",obj)
+             .then((response) => {
+              showNewUserOnScreen(response.data)
+            })
+             .catch((err) => {
+              document.body.innerHTML = document.body.innerHTML +"<h4>something went wrong</h4>"
+              console.log(err);
+             })
+          }
+           window.addEventListener("DOMContentLoaded", () => {
+            axios.get("https://crudcrud.com/api/2a733488d8e34d288c3a851ed99426f9/Details")
+             .then((response) => {
+              console.log(response)
+
+              for(var i = 0; i< response.data.length; i++){
+                showNewUserOnScreen(response.data[i])
+              }
+             })
+             .catch((err) => {
+              console.log(err);
+             })
+            })
+
+            function showNewUserOnScreen(user){
+
+            document.getElementById('ExpenseAmount').value = '';
+            document.getElementById('Description').value = '';
+            
+
+             if(localStorage.getItem(user.ExpenseAmount) !== null){
+               removeUserFromScreen(user.ExpenseAmount)
+             }
+ 
+              const parentNode = document.getElementById('addcustomerform');
+              const childHTML = `<li id=${user._id}>', '${user.ExpenseAmount} - ${user.Description} - ${user.ExpenseCategory}'
+                                        <button onclick=deleteUser('${user._id}')> Delete Expense </button>
+                                        <button onclick=editUserDetails('${user.ExpenseAmount}','${user.Description}','${user.ExpenseCategory}','${user._id})> Edit Espense </button>
+                                     </li>`
+                parentNode.innerHTML = parentNode.innerHTML + childHTML;                     
+
+            }
+
+            function editUserDetails(ExpenseAmount, Description, _id){
+             document.getElementById('Description').value = Description;
+             document.getElementById('ExpenseAmount').value = ExpenseAmount;
+             
+             deleteUser(_id)
+            }
+
+
+            function deleteUser(_id){
+                axios.delete('https://crudcrud.com/api/2a733488d8e34d288c3a851ed99426f9/Details/${_id}')
+               .then((response) => {
+                removeUserFromScreen(_id)
+               })
+               .catch((err) => {
+                console.log(err)
+               })    
+            }
+
+            function removeUserFromScreen(_id){
+                const parentNode = document.getElementById('addcustomerform');
+                const childNodeToBeDeleted = document.getElementById(_id);
+
+            }
+            </script>
+        </form>
+        
+    </div>     
+
+
+</body>
+</html>
